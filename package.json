@@ -1,0 +1,14 @@
+{
+  "name": "1b1f59709806de63",
+  "main": "1b1f59709806de63@126.js",
+  "version": "126.0.0",
+  "homepage": "https://observablehq.com/d/1b1f59709806de63",
+  "author": {
+    "name": "Avery's d3 workspace",
+    "url": "https://observablehq.com/@averys-d3-workspace"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4 - 5"
+  }
+}

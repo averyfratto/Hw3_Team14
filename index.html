@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Team 14 Visualizations</title>
+  <script src="d3.js"></script>
+  <link rel="stylesheet" type="text/css" href="./inspector.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      line-height: 1.6;
+    }
+    section {
+      margin-bottom: 80px;
+    }
+    .description {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Team 14: Visualzing the Haunted Places Dataset</h1>
+
+  <div class="description">
+    <!-- Site-wide intro -->
+    <p><strong>Overview:</strong> In this site, we want show some of the visuals one can make with d3 and out haunted places dataset. As outlined in our project report, we've taken many steps to enchance, featurize, and build upon locations of haunted sightings.</p>
+    <p><strong>Data Sources:</strong> Data was collected from OpenStreetMap, the US Government, and other public sources. Contact afratto@usc.edu for more details.</p>
+  </div>
+
+  <!-- Pie Chart Section -->
+  <section>
+    <h2>Distribution of Sightings across the 50 States + D.C.</h2>
+    <div class="description">
+      <p>INSERT TEXT HERE — Explain what the pie chart represents, how the data was grouped, and any patterns or surprises.</p>
+    </div>
+    <div id="chart"></div>
+  </section>
+
+  <!-- Map Visualization -->
+  <section>
+    <h2>Map Visualization</h2>
+    <div class="description">
+      <p>The map below shows each haunted sighting, with larger points representing cluters of haunted sightings, and the color showing proximity to places of worship. We can see a correlational trend, where clusters of haunted sightings are close to places of worship- Southern California being a big example.</p>
+    </div>
+    <div id="map-viz"></div>
+  </section>
+
+  <!-- Word Visualization -->
+  <section>
+    <h2>Word Cloud Visualization</h2>
+    <div class="description">
+      <p>Using our descriptions of the haunted sightings, we created a word cloud to understand which words pop up the most frequently. Clearly, people, seen, night, and old are reoccuring themes.</p>
+    </div>
+    <div id="word-viz"></div>
+  </section>
+
+  <!-- Moon Visualization -->
+  <section>
+    <h2>Moon Visualization</h2>
+    <div class="description">
+      <p>Our team added three new features to the haunted dataset, all pertaining to the moon the night of a haunting. The distance from the moon, the diameter of the moon, and the phase of the moon are all key parts of our story. From the graphs below, we can see there's a strong connection between each variable and the frequency of sightings.</p>
+    </div>
+    <div id="moon-viz"></div>
+  </section>
+
+  <!-- Scatterplot Visualization -->
+  <section>
+    <h2>Scatterplots of Witness Count, Binge Drinking, Semantic Similarity, and Fuzzy Similarity</h2>
+    <div class="description">
+      <p>Our dataset included a few important numerical values: Binge Drinking Rate, Witness Count, and our Fuzzy and Semantic Similarity scores- numeric indicators derived fromt he descriptions that allowed us to compare the text to other numeric data types. this allows us to see how binge drinking rate and witness count influence the descriptions.</p>
+    </div>
+    <div id="scatterplot-viz"></div>
+  </section>
+
+  <div class="description">
+    <!-- Optional closing summary or reflection -->
+    <p><strong>Conclusion:</strong> This of course is just an exploratroy analysis, as the visuals here merely demonstrate a correlation. Furter work will be done to find causal effects.</p>
+  </div>
+
+  <!-- PIE CHART SCRIPT -->
+  <script type="text/javascript">
+
+    const w = 1000;
+    const h = 900;
+    const padding = 20;
+    
+    // d3.scaleOrdinal(d3.schemeObservable10) can only be used for 10 colors so we use d3.scaleSequential
+    let color = d3.scaleSequential() 
+        .domain([0, 50])  // 51 colors
+        .interpolator(d3.interpolateRainbow);
+    
+    d3.json("FINAL_HW2_EXTRACT_DATASET_subset.json").then(data => {
+    
+        // Aggregate: count number of topic locations per state
+        const datasetState = d3.rollup(data, d => d.length, d => d.state);
+    
+        // Convert Map to array
+        const pieDataArray = Array.from(datasetState, ([key, value]) => ({ key, value }));
+    
+        console.log(pieDataArray);          // array of data objects
+    
+        // Sort alphabetically
+        pieDataArray.sort((a, b) => d3.ascending(a.key, b.key));
+    
+        // Create SVG
+        const svg1 = d3.select("#chart")
+                      .append("svg")
+                      .attr("width", w)
+                      .attr("height", h);
+    
+        const outerRadius = (h / 2) * 0.8;
+        const innerRadius = outerRadius * 0.5;
+    
+        const arc = d3.arc()
+                      .innerRadius(innerRadius)
+                      .outerRadius(outerRadius);
+    
+        const pie = d3.pie()
+                      .value(d => d.value);
+    
+        const arcs = svg1.selectAll("g.arc")
+                         .data(pie(pieDataArray))
+                         .enter()
+                         .append("g")
+                         .attr("class", "arc")
+                         .attr("transform", "translate(" + (w / 2 - 50) + "," + (h / 2) + ")");
+    
+        // Draw arc paths
+        arcs.append("path")
+            .attr("fill", (d, i) => color(i))
+            .attr("d", arc);
+    
+        // Add state names rotated properly
+        arcs.append("text")
+            .filter(d => (d.endAngle - d.startAngle) > 0.06) // show only if slice is big enough
+            .attr("transform", function(d) {
+                const [x, y] = arc.centroid(d);
+                const angle = (d.startAngle + d.endAngle) / 2;
+                const rotation = (angle * 180 / Math.PI) - 90;
+                const labelOffset = 1.1;
+                return `translate(${x * labelOffset}, ${y * labelOffset}) rotate(${rotation})`;
+            })
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .attr("font-size", "11px")
+            .style("font-weight", "bold")
+            .text(d => `${d.data.key} (${d.data.value})`);
+    
+        // Legend
+        const legend = svg1.append("g")
+            .attr("class", "legend")
+            .attr("transform", "translate(" + (w - padding - 100) + "," + (padding) + ")");
+    
+        legend.selectAll("rect")
+            .data(pieDataArray)
+            .enter()
+            .append("rect")
+            .attr("x", 0)
+            .attr("y", (d, i) => padding + i * 20)
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", (d, i) => color(i));
+    
+        legend.selectAll("text")
+            .data(pieDataArray)
+            .enter()
+            .append("text")
+            .attr("x", 15)
+            .attr("y", (d, i) => padding + i * 20 + 9)
+            .attr("font-size", 12)
+            .text(d => d.key);
+    
+    }).catch(error => {
+        console.error('Error loading JSON:', error);
+    });
+
+  </script>
+  
+  <!-- MAP MODULE -->
+  <script type="module">
+    import define from "./Map2index.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeMap = new Runtime();
+    runtimeMap.module(define, Inspector.into(document.querySelector("#map-viz")));
+  </script>
+
+    <!-- WORD MODULE -->
+  <script type="module">
+    import define from "./WORDindex.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeWord = new Runtime();
+    runtimeWird.module(define, Inspector.into(document.querySelector("#word-viz")));
+  </script>
+
+  <!-- MOON MODULE -->
+  <script type="module">
+    import define from "./MOONindex.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeMoon = new Runtime();
+    runtimeMoon.module(define, Inspector.into(document.querySelector("#moon-viz")));
+  </script>
+
+  <!-- SCATTERPLOT MODULE -->
+  <script type="module">
+    import define from "./SCATTERindex.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeScatter = new Runtime();
+    runtimeScatter.module(define, Inspector.into(document.querySelector("#scatterplot-viz")));
+  </script>
+
+</body>
+</html>
+

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Pie Chart: Topic Locations by State</title>
+  <script type="text/javascript" src="d3.js"></script>
+  <style type="text/css">
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Distribution of Topic Locations for All 50 States + D.C.</h1>
+
+<div id="chart"></div>
+
+<script type="text/javascript">
+
+const w = 1000;
+const h = 900;
+const padding = 20;
+
+// d3.scaleOrdinal(d3.schemeObservable10) can only be used for 10 colors so we use d3.scaleSequential
+let color = d3.scaleSequential() 
+    .domain([0, 50])  // 51 colors
+    .interpolator(d3.interpolateRainbow);
+
+d3.json("FINAL_HW2_EXTRACT_DATASET_subset.json").then(data => {
+
+    // Aggregate: count number of topic locations per state
+    const datasetState = d3.rollup(data, d => d.length, d => d.state);
+
+    // Convert Map to array
+    const pieDataArray = Array.from(datasetState, ([key, value]) => ({ key, value }));
+
+    console.log(pieDataArray);          // array of data objects
+
+    // Sort alphabetically
+    pieDataArray.sort((a, b) => d3.ascending(a.key, b.key));
+
+    // Create SVG
+    const svg1 = d3.select("#chart")
+                  .append("svg")
+                  .attr("width", w)
+                  .attr("height", h);
+
+    const outerRadius = (h / 2) * 0.8;
+    const innerRadius = outerRadius * 0.5;
+
+    const arc = d3.arc()
+                  .innerRadius(innerRadius)
+                  .outerRadius(outerRadius);
+
+    const pie = d3.pie()
+                  .value(d => d.value);
+
+    const arcs = svg1.selectAll("g.arc")
+                     .data(pie(pieDataArray))
+                     .enter()
+                     .append("g")
+                     .attr("class", "arc")
+                     .attr("transform", "translate(" + (w / 2 - 50) + "," + (h / 2) + ")");
+
+    // Draw arc paths
+    arcs.append("path")
+        .attr("fill", (d, i) => color(i))
+        .attr("d", arc);
+
+    // Add state names rotated properly
+    arcs.append("text")
+        .filter(d => (d.endAngle - d.startAngle) > 0.06) // show only if slice is big enough
+        .attr("transform", function(d) {
+            const [x, y] = arc.centroid(d);
+            const angle = (d.startAngle + d.endAngle) / 2;
+            const rotation = (angle * 180 / Math.PI) - 90;
+            const labelOffset = 1.1;
+            return `translate(${x * labelOffset}, ${y * labelOffset}) rotate(${rotation})`;
+        })
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "11px")
+        .style("font-weight", "bold")
+        .text(d => `${d.data.key} (${d.data.value})`);
+
+    // Legend
+    const legend = svg1.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(" + (w - padding - 100) + "," + (padding) + ")");
+
+    legend.selectAll("rect")
+        .data(pieDataArray)
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", (d, i) => padding + i * 20)
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("fill", (d, i) => color(i));
+
+    legend.selectAll("text")
+        .data(pieDataArray)
+        .enter()
+        .append("text")
+        .attr("x", 15)
+        .attr("y", (d, i) => padding + i * 20 + 9)
+        .attr("font-size", 12)
+        .text(d => d.key);
+
+}).catch(error => {
+    console.error('Error loading JSON:', error);
+});
+
+</script>
+
+</body>
+</html>
