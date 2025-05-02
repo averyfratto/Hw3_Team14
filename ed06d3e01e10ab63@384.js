@@ -3,7 +3,6 @@ md`<div style="color: grey; font: 13px/25.5px var(--sans-serif); text-transform:
 
 # Word cloud
 
-A demonstration of [d3-cloud](https://github.com/jasondavies/d3-cloud/). Paste into or edit the text below to update the chart. Note: word clouds [may be harmful](https://www.niemanlab.org/2011/10/word-clouds-considered-harmful/).`
 )}
 
 function _d3Cloud(require){return(
