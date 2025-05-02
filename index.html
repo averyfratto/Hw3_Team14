@@ -49,7 +49,7 @@
     <p><strong>Data Sources:</strong> Data was collected from OpenStreetMap, the US Government, and other public sources. Contact afratto@usc.edu for more details.</p>
   </div>
 
-  <!-- Visualization Sections (unchanged) -->
+  <!-- Pie Chart Section -->
   <section>
     <h2>Distribution of Sightings across the 50 States + D.C.</h2>
     <div class="description">
@@ -58,6 +58,7 @@
     <div id="chart"></div>
   </section>
 
+  <!-- Map Visualization -->
   <section>
     <h2>Map Visualization</h2>
     <div class="description">
@@ -66,6 +67,7 @@
     <div id="map-viz"></div>
   </section>
 
+  <!-- Word Visualization -->
   <section>
     <h2>Word Cloud Visualization</h2>
     <div class="description">
@@ -74,6 +76,7 @@
     <div id="word-viz"></div>
   </section>
 
+  <!-- Moon Visualization -->
   <section>
     <h2>Moon Visualization</h2>
     <div class="description">
@@ -82,6 +85,7 @@
     <div id="moon-viz"></div>
   </section>
 
+  <!-- Scatterplot Visualization -->
   <section>
     <h2>Scatterplots of Witness Count, Binge Drinking, Semantic Similarity, and Fuzzy Similarity</h2>
     <div class="description">
@@ -94,31 +98,121 @@
     <p><strong>Conclusion:</strong> This of course is just an exploratory analysis, as the visuals here merely demonstrate a correlation. Further work needs to be done to find causal effects. However, from this project it's clear that religiosity, moon phases, and geography seem to play roles in the occurrence of haunted sightings.</p>
   </div>
 
-  <!-- All script blocks remain unchanged -->
   <!-- PIE CHART SCRIPT -->
   <script type="text/javascript">
-    // (unchanged code here)
+    const w = 1000;
+    const h = 900;
+    const padding = 20;
+
+    let color = d3.scaleSequential()
+        .domain([0, 50])
+        .interpolator(d3.interpolateRainbow);
+
+    d3.json("FINAL_HW2_EXTRACT_DATASET_subset.json").then(data => {
+        const datasetState = d3.rollup(data, d => d.length, d => d.state);
+        const pieDataArray = Array.from(datasetState, ([key, value]) => ({ key, value }));
+        pieDataArray.sort((a, b) => d3.ascending(a.key, b.key));
+
+        const svg1 = d3.select("#chart")
+                      .append("svg")
+                      .attr("width", w)
+                      .attr("height", h);
+
+        const outerRadius = (h / 2) * 0.8;
+        const innerRadius = outerRadius * 0.5;
+
+        const arc = d3.arc()
+                      .innerRadius(innerRadius)
+                      .outerRadius(outerRadius);
+
+        const pie = d3.pie().value(d => d.value);
+
+        const arcs = svg1.selectAll("g.arc")
+                         .data(pie(pieDataArray))
+                         .enter()
+                         .append("g")
+                         .attr("class", "arc")
+                         .attr("transform", "translate(" + (w / 2 - 50) + "," + (h / 2) + ")");
+
+        arcs.append("path")
+            .attr("fill", (d, i) => color(i))
+            .attr("d", arc);
+
+        arcs.append("text")
+            .filter(d => (d.endAngle - d.startAngle) > 0.06)
+            .attr("transform", function(d) {
+                const [x, y] = arc.centroid(d);
+                const angle = (d.startAngle + d.endAngle) / 2;
+                const rotation = (angle * 180 / Math.PI) - 90;
+                const labelOffset = 1.1;
+                return `translate(${x * labelOffset}, ${y * labelOffset}) rotate(${rotation})`;
+            })
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .attr("font-size", "11px")
+            .style("font-weight", "bold")
+            .text(d => `${d.data.key} (${d.data.value})`);
+
+        const legend = svg1.append("g")
+            .attr("class", "legend")
+            .attr("transform", "translate(" + (w - padding - 100) + "," + (padding) + ")");
+
+        legend.selectAll("rect")
+            .data(pieDataArray)
+            .enter()
+            .append("rect")
+            .attr("x", 0)
+            .attr("y", (d, i) => padding + i * 20)
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", (d, i) => color(i));
+
+        legend.selectAll("text")
+            .data(pieDataArray)
+            .enter()
+            .append("text")
+            .attr("x", 15)
+            .attr("y", (d, i) => padding + i * 20 + 9)
+            .attr("font-size", 12)
+            .text(d => d.key);
+
+    }).catch(error => {
+        console.error('Error loading JSON:', error);
+    });
   </script>
 
   <!-- MAP MODULE -->
   <script type="module">
-    // (unchanged code here)
+    import define from "./Map2index.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeMap = new Runtime();
+    runtimeMap.module(define, Inspector.into(document.querySelector("#map-viz")));
   </script>
 
   <!-- WORD MODULE -->
   <script type="module">
-    // (unchanged code here)
+    import define from "./WORDindex.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeWord = new Runtime();
+    runtimeWord.module(define, Inspector.into(document.querySelector("#word-viz")));
   </script>
 
   <!-- MOON MODULE -->
   <script type="module">
-    // (unchanged code here)
+    import define from "./MOONindex.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeMoon = new Runtime();
+    runtimeMoon.module(define, Inspector.into(document.querySelector("#moon-viz")));
   </script>
 
   <!-- SCATTERPLOT MODULE -->
   <script type="module">
-    // (unchanged code here)
+    import define from "./SCATTERindex.js";
+    import {Runtime, Inspector} from "./runtime.js";
+    const runtimeScatter = new Runtime();
+    runtimeScatter.module(define, Inspector.into(document.querySelector("#scatterplot-viz")));
   </script>
 
 </body>
 </html>
+
