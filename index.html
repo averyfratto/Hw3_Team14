@@ -2,142 +2,210 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Team 14 Visualizations</title>
+
+  <!-- Fonts and D3 -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Roboto&display=swap" rel="stylesheet">
   <script src="d3.js"></script>
-  <link rel="stylesheet" type="text/css" href="./inspector.css">
+
+  <!-- Styles -->
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       margin: 40px;
+      background-color: #1a1a1a;
+      color: #f0f0f0;
       line-height: 1.6;
     }
-    section {
-      margin-bottom: 80px;
+
+    h1, h2 {
+      font-family: 'Playfair Display', serif;
+      color: #f8e71c;
+      text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.1);
     }
+
+    nav {
+      position: sticky;
+      top: 0;
+      background: #111;
+      padding: 10px 20px;
+      z-index: 10;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav a {
+      color: #f8e71c;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
     .description {
       margin-bottom: 20px;
-      font-size: 16px;
-      color: #333;
+      font-size: 17px;
+      color: #ccc;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-left: 4px solid #f8e71c;
+      border-radius: 5px;
+    }
+
+    section {
+      margin-bottom: 80px;
+      padding: 20px;
+      border-top: 1px solid #444;
+    }
+
+    #chart, #map-viz, #word-viz, #moon-viz, #scatterplot-viz {
+      margin-top: 20px;
+      background-color: #2a2a2a;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+
+    svg {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    .legend text {
+      fill: #ccc;
+    }
+
+    strong {
+      color: #ffdd57;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        margin: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+      }
+
+      .description {
+        font-size: 15px;
+      }
+
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
+  <h1>Team 14: Visualizing the Haunted Places Dataset</h1>
 
-  <h1>Team 14: Visualzing the Haunted Places Dataset</h1>
+  <nav>
+    <a href="#chart">Pie Chart</a>
+    <a href="#map-viz">Map</a>
+    <a href="#word-viz">Word Cloud</a>
+    <a href="#moon-viz">Moon</a>
+    <a href="#scatterplot-viz">Scatter</a>
+  </nav>
 
   <div class="description">
-    <!-- Site-wide intro -->
-    <p><strong>Overview:</strong> In this site, we want show some of the visuals one can make with d3 and out haunted places dataset. As outlined in our project report, we've taken many steps to enchance, featurize, and build upon locations of haunted sightings.</p>
+    <p><strong>Overview:</strong> This site presents visuals built with D3.js using our haunted places dataset. As outlined in our project report, we enhanced, featurized, and explored patterns within locations of paranormal sightings.</p>
     <p><strong>Data Sources:</strong> Data was collected from OpenStreetMap, the US Government, and other public sources. Contact afratto@usc.edu for more details.</p>
   </div>
 
-  <!-- Pie Chart Section -->
+  <!-- Sections -->
   <section>
     <h2>Distribution of Sightings across the 50 States + D.C.</h2>
     <div class="description">
-      <p>Our first visual is a simple pie chart, showing the frequency of sitings across the US. This was made possible by our use of a geoparaser to extract locations out of our sightings.</p>
+      <p>A pie chart showing frequency of sightings across states. Made using a geoparser to extract and count locations.</p>
     </div>
     <div id="chart"></div>
   </section>
 
-  <!-- Map Visualization -->
   <section>
     <h2>Map Visualization</h2>
     <div class="description">
-      <p>The map below shows each haunted sighting, with larger points representing cluters of haunted sightings, and the color showing proximity to places of worship. We can see a correlational trend, where clusters of haunted sightings are close to places of worship- Southern California being a big example.</p>
+      <p>Each haunted sighting shown on the map; larger points = clusters; colors = proximity to religious places. Notable patterns emerge in Southern California.</p>
     </div>
     <div id="map-viz"></div>
   </section>
 
-  <!-- Word Visualization -->
   <section>
     <h2>Word Cloud Visualization</h2>
     <div class="description">
-      <p>Using our descriptions of the haunted sightings, we created a word cloud to understand which words pop up the most frequently. Clearly, 'people', 'seen', 'night', and 'old' are reoccuring themes. The interactive visualization also lets viewers hover over words to see their exact occurrence counts, ensuring clarity and readability.</p>
+      <p>A word cloud from haunting descriptions. Hover to see frequency. Common themes: 'people', 'seen', 'night', 'old'.</p>
     </div>
     <div id="word-viz"></div>
   </section>
 
-  <!-- Moon Visualization -->
   <section>
     <h2>Moon Visualization</h2>
     <div class="description">
-      <p>Our team added three new features to the haunted dataset, all pertaining to the moon the night of a haunting. The distance from the moon, the diameter of the moon, and the phase of the moon are all key parts of our story. From the graphs below, we can see there's a strong connection between each variable and the frequency of sightings.</p>
+      <p>We added moon features: distance, diameter, and phase. These show strong patterns related to sighting frequency.</p>
     </div>
     <div id="moon-viz"></div>
   </section>
 
-  <!-- Scatterplot Visualization -->
   <section>
-    <h2>Scatterplots of Witness Count, Binge Drinking, Semantic Similarity, and Fuzzy Similarity</h2>
+    <h2>Scatterplots of Witness Count, Binge Drinking, and Text Similarities</h2>
     <div class="description">
-      <p>Our dataset included a few important numerical values: Binge Drinking Rate, Witness Count, and our Fuzzy and Semantic Similarity scores- numeric indicators derived fromt he descriptions that allowed us to compare the text to other numeric data types. this allows us to see how binge drinking rate and witness count influence the descriptions.</p>
+      <p>Numerical insights from witness count, binge drinking, fuzzy/semantic similarity. How do external data impact descriptions?</p>
     </div>
     <div id="scatterplot-viz"></div>
   </section>
 
   <div class="description">
-    <!-- Optional closing summary or reflection -->
-    <p><strong>Conclusion:</strong> This of course is just an exploratroy analysis, as the visuals here merely demonstrate a correlation. Further needs be done to find causal effects. However, from this project it's clear that religiosity, moon phases, and geography seem to play roles in the occurence of haunted sightings.</p>
+    <p><strong>Conclusion:</strong> This is exploratory analysis. While correlations emerge (religiosity, moon phases, geography), further study is needed to determine causality.</p>
   </div>
 
   <!-- PIE CHART SCRIPT -->
   <script type="text/javascript">
-
     const w = 1000;
     const h = 900;
     const padding = 20;
-    
-    // d3.scaleOrdinal(d3.schemeObservable10) can only be used for 10 colors so we use d3.scaleSequential
-    let color = d3.scaleSequential() 
-        .domain([0, 50])  // 51 colors
+    let color = d3.scaleSequential()
+        .domain([0, 50])
         .interpolator(d3.interpolateRainbow);
-    
+
     d3.json("FINAL_HW2_EXTRACT_DATASET_subset.json").then(data => {
-    
-        // Aggregate: count number of topic locations per state
         const datasetState = d3.rollup(data, d => d.length, d => d.state);
-    
-        // Convert Map to array
         const pieDataArray = Array.from(datasetState, ([key, value]) => ({ key, value }));
-    
-        console.log(pieDataArray);          // array of data objects
-    
-        // Sort alphabetically
         pieDataArray.sort((a, b) => d3.ascending(a.key, b.key));
-    
-        // Create SVG
+
         const svg1 = d3.select("#chart")
                       .append("svg")
                       .attr("width", w)
                       .attr("height", h);
-    
+
         const outerRadius = (h / 2) * 0.8;
         const innerRadius = outerRadius * 0.5;
-    
-        const arc = d3.arc()
-                      .innerRadius(innerRadius)
-                      .outerRadius(outerRadius);
-    
-        const pie = d3.pie()
-                      .value(d => d.value);
-    
+
+        const arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+        const pie = d3.pie().value(d => d.value);
+
         const arcs = svg1.selectAll("g.arc")
                          .data(pie(pieDataArray))
                          .enter()
                          .append("g")
                          .attr("class", "arc")
-                         .attr("transform", "translate(" + (w / 2 - 50) + "," + (h / 2) + ")");
-    
-        // Draw arc paths
+                         .attr("transform", `translate(${w / 2 - 50},${h / 2})`);
+
         arcs.append("path")
             .attr("fill", (d, i) => color(i))
             .attr("d", arc);
-    
-        // Add state names rotated properly
+
         arcs.append("text")
-            .filter(d => (d.endAngle - d.startAngle) > 0.06) // show only if slice is big enough
-            .attr("transform", function(d) {
+            .filter(d => (d.endAngle - d.startAngle) > 0.06)
+            .attr("transform", d => {
                 const [x, y] = arc.centroid(d);
                 const angle = (d.startAngle + d.endAngle) / 2;
                 const rotation = (angle * 180 / Math.PI) - 90;
@@ -149,12 +217,11 @@
             .attr("font-size", "11px")
             .style("font-weight", "bold")
             .text(d => `${d.data.key} (${d.data.value})`);
-    
-        // Legend
+
         const legend = svg1.append("g")
             .attr("class", "legend")
-            .attr("transform", "translate(" + (w - padding - 100) + "," + (padding) + ")");
-    
+            .attr("transform", `translate(${w - padding - 100},${padding})`);
+
         legend.selectAll("rect")
             .data(pieDataArray)
             .enter()
@@ -164,7 +231,7 @@
             .attr("width", 10)
             .attr("height", 10)
             .attr("fill", (d, i) => color(i));
-    
+
         legend.selectAll("text")
             .data(pieDataArray)
             .enter()
@@ -173,14 +240,10 @@
             .attr("y", (d, i) => padding + i * 20 + 9)
             .attr("font-size", 12)
             .text(d => d.key);
-    
-    }).catch(error => {
-        console.error('Error loading JSON:', error);
-    });
-
+    }).catch(error => console.error('Error loading JSON:', error));
   </script>
-  
-  <!-- MAP MODULE -->
+
+  <!-- MODULE SCRIPTS -->
   <script type="module">
     import define from "./Map2index.js";
     import {Runtime, Inspector} from "./runtime.js";
@@ -188,7 +251,6 @@
     runtimeMap.module(define, Inspector.into(document.querySelector("#map-viz")));
   </script>
 
-    <!-- WORD MODULE -->
   <script type="module">
     import define from "./WORDindex.js";
     import {Runtime, Inspector} from "./runtime.js";
@@ -196,7 +258,6 @@
     runtimeWord.module(define, Inspector.into(document.querySelector("#word-viz")));
   </script>
 
-  <!-- MOON MODULE -->
   <script type="module">
     import define from "./MOONindex.js";
     import {Runtime, Inspector} from "./runtime.js";
@@ -204,14 +265,11 @@
     runtimeMoon.module(define, Inspector.into(document.querySelector("#moon-viz")));
   </script>
 
-  <!-- SCATTERPLOT MODULE -->
   <script type="module">
     import define from "./SCATTERindex.js";
     import {Runtime, Inspector} from "./runtime.js";
     const runtimeScatter = new Runtime();
     runtimeScatter.module(define, Inspector.into(document.querySelector("#scatterplot-viz")));
   </script>
-
 </body>
 </html>
-
